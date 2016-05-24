@@ -1011,6 +1011,7 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
 
     vlc_event_manager_init( p_em, p_input );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaExtrasChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemAdded );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemTreeAdded );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemDurationChanged );
