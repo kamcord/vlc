@@ -829,6 +829,13 @@ static int Demux( demux_t *p_demux )
         UpdateSeekPoint( p_demux, p_sys->i_pcr );
     }
 
+    /* Tell demuxer if metadata has changed */
+    if( p_sys->ic->event_flags & AVFMT_EVENT_FLAG_METADATA_UPDATED )
+    {
+        p_demux->info.i_update |= INPUT_UPDATE_META;
+        p_sys->ic->event_flags &= ~AVFMT_EVENT_FLAG_METADATA_UPDATED;
+    }
+
     if( p_sys->tk[pkt.stream_index] != NULL )
         es_out_Send( p_demux->out, p_sys->tk[pkt.stream_index], p_frame );
     else
@@ -913,6 +920,56 @@ static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order )
                             CLOCK_FREQ * (c1-c0) / 100;
     return p_frame;
 }
+
+static void AVMetaToVLCMeta( AVDictionary *p_dict, vlc_meta_t *p_meta )
+{
+    static const char names[][10] = {
+        [vlc_meta_Title] = "title",
+        [vlc_meta_Artist] = "artist",
+        [vlc_meta_Genre] = "genre",
+        [vlc_meta_Copyright] = "copyright",
+        [vlc_meta_Album] = "album",
+        //[vlc_meta_TrackNumber] -- TODO: parse number/total value
+        [vlc_meta_Description] = "comment",
+        //[vlc_meta_Rating]
+        [vlc_meta_Date] = "date",
+        [vlc_meta_Setting] = "encoder",
+        //[vlc_meta_URL]
+        [vlc_meta_Language] = "language",
+        //[vlc_meta_NowPlaying]
+        [vlc_meta_Publisher] = "publisher",
+        [vlc_meta_EncodedBy] = "encoded_by",
+        //[vlc_meta_ArtworkURL]
+        //[vlc_meta_TrackID]
+        //[vlc_meta_TrackTotal]
+    };
+
+    /* Loop over all metadata entries in the dictionary */
+    AVDictionaryEntry *p_en = NULL;
+    int added = 0;
+    while ((p_en = av_dict_get(p_dict, "", p_en, AV_DICT_IGNORE_SUFFIX))) {
+        added = 0;
+        if( p_en != NULL && p_en->value != NULL && IsUTF8(p_en->value) ) {
+            /* TODO*: Constant time lookup instead of linear */
+            for( unsigned i = 0; i < sizeof(names) / sizeof(*names); i++)
+            {
+                if( !names[i][0] )
+                    continue;
+
+                /* Add metadata, putting 'extra' metadata that isn't in the predefined list */
+                if( !strcmp( names[i], p_en->key ) )
+                {
+                    vlc_meta_Set( p_meta, i, p_en->value );
+                    added = 1;
+                }
+            }
+
+            if ( !added )
+                vlc_meta_AddExtra( p_meta, p_en->key, p_en->value );
+        }
+    }
+}
+
 
 /*****************************************************************************
  * Control:
@@ -1010,38 +1067,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_META:
         {
-            static const char names[][10] = {
-                [vlc_meta_Title] = "title",
-                [vlc_meta_Artist] = "artist",
-                [vlc_meta_Genre] = "genre",
-                [vlc_meta_Copyright] = "copyright",
-                [vlc_meta_Album] = "album",
-                //[vlc_meta_TrackNumber] -- TODO: parse number/total value
-                [vlc_meta_Description] = "comment",
-                //[vlc_meta_Rating]
-                [vlc_meta_Date] = "date",
-                [vlc_meta_Setting] = "encoder",
-                //[vlc_meta_URL]
-                [vlc_meta_Language] = "language",
-                //[vlc_meta_NowPlaying]
-                [vlc_meta_Publisher] = "publisher",
-                [vlc_meta_EncodedBy] = "encoded_by",
-                //[vlc_meta_ArtworkURL]
-                //[vlc_meta_TrackID]
-                //[vlc_meta_TrackTotal]
-            };
             vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
             AVDictionary *dict = p_sys->ic->metadata;
 
-            for( unsigned i = 0; i < sizeof(names) / sizeof(*names); i++)
-            {
-                if( !names[i][0] )
-                    continue;
-
-                AVDictionaryEntry *e = av_dict_get( dict, names[i], NULL, 0 );
-                if( e != NULL && e->value != NULL && IsUTF8(e->value) )
-                    vlc_meta_Set( p_meta, i, e->value );
-            }
+            AVMetaToVLCMeta( dict, p_meta );
             return VLC_SUCCESS;
         }
 
