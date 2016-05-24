@@ -573,6 +573,43 @@ LIBVLC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
  */
 LIBVLC_API int libvlc_media_save_meta( libvlc_media_t *p_md );
 
+/**
+ * Read the "extra" meta of the media. Creates a copy which should be
+ * freed when no longer needed.
+ *
+ * If the media has not yet been parsed this will return NULL.
+ *
+ * \see libvlc_media_parse
+ * \see libvlc_media_parse_async
+ * \see libvlc_MediaMetaChanged
+ *
+ * \param p_md the media descriptor
+ * \param e_meta the meta to read
+ * \return the media's "extra" meta
+ */
+LIBVLC_API const char * libvlc_media_get_meta_extra( libvlc_media_t *p_md, const char *psz_name );
+
+/**
+ * Return the count of "extra" in the meta of the media.
+ *
+ * If the media has not yet been parsed this will return 0.
+ *
+ * \see libvlc_media_parse
+ * \see libvlc_media_parse_async
+ * \see libvlc_MediaMetaChanged
+ *
+ * \param p_md the media descriptor
+ * \param e_meta the meta to read
+ * \return the media's meta
+ */
+LIBVLC_API unsigned libvlc_media_get_meta_extra_count( libvlc_media_t *p_md );
+
+/**
+ * Allocate a copy of all extra meta names and a table with it.
+ * Be sure to free both the returned pointers and its name.
+ */
+LIBVLC_API char** libvlc_media_copy_meta_extra_names( libvlc_media_t *p_md );
+    
 
 /**
  * Get current state of media descriptor object. Possible media states are

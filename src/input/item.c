@@ -274,6 +274,58 @@ char *input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
     return psz;
 }
 
+const char *input_item_GetMetaExtra( input_item_t *p_i, const char *psz )
+{
+    vlc_mutex_lock( &p_i->lock );
+
+    if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return NULL;
+    }
+
+    char *psz_val = NULL;
+    psz_val = vlc_meta_GetExtra( p_i->p_meta, psz );
+    if( psz_val )
+        psz_val = strdup( psz_val );
+
+    vlc_mutex_unlock( &p_i->lock );
+    return psz_val;
+}
+
+unsigned input_item_GetMetaExtraCount( input_item_t *p_i)
+{
+    vlc_mutex_lock( &p_i->lock );
+
+    if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return 0;
+    }
+
+    unsigned count = vlc_meta_GetExtraCount( p_i->p_meta );
+    vlc_mutex_unlock( &p_i->lock);
+
+    return count;
+}
+
+char ** input_item_CopyMetaExtraNames( input_item_t *p_i)
+{
+    vlc_mutex_lock( &p_i->lock );
+
+    if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return NULL;
+    }
+
+    char ** names = NULL;
+    names = vlc_meta_CopyExtraNames( p_i->p_meta );
+
+    vlc_mutex_unlock( &p_i->lock );
+    return names;
+}
+
 /* Get the title of a given item or fallback to the name if the title is empty */
 char *input_item_GetTitleFbName( input_item_t *p_item )
 {

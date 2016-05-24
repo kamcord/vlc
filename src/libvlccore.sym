@@ -176,11 +176,14 @@ input_item_AddOption
 input_item_AddOptions
 input_item_AddOpaque
 input_item_Copy
+input_item_CopyMetaExtraNames
 input_item_CopyOptions
 input_item_DelInfo
 input_item_GetDuration
 input_item_GetInfo
 input_item_GetMeta
+input_item_GetMetaExtra
+input_item_GetMetaExtraCount
 input_item_GetName
 input_item_GetNowPlayingFb
 input_item_GetTitleFbName

@@ -639,6 +639,26 @@ int libvlc_media_save_meta( libvlc_media_t *p_md )
 }
 
 /**************************************************************************
++ * Getter for "extra" meta information
++ **************************************************************************/
+
+const char * libvlc_media_get_meta_extra( libvlc_media_t *p_md, const char *psz_name )
+{
+    return input_item_GetMetaExtra( p_md->p_input_item, psz_name );
+}
+
+unsigned libvlc_media_get_meta_extra_count( libvlc_media_t *p_md )
+{
+    return input_item_GetMetaExtraCount( p_md->p_input_item );
+}
+
+char** libvlc_media_copy_meta_extra_names( libvlc_media_t *p_md )
+{
+    return input_item_CopyMetaExtraNames( p_md->p_input_item );
+}
+
+
+/**************************************************************************
  * Getter for state information
  * Can be error, playing, buffering, NothingSpecial.
  **************************************************************************/

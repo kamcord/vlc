@@ -145,7 +145,7 @@ void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const char *psz_val
 
 const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name )
 {
-    return (char *)vlc_dictionary_value_for_key(&m->extra_tags, psz_name);
+    return (const char *)vlc_dictionary_value_for_key(&m->extra_tags, psz_name);
 }
 
 unsigned vlc_meta_GetExtraCount( const vlc_meta_t *m )
