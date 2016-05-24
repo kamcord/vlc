@@ -1395,6 +1395,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
     input_item_SetPreparsed( p_item, true );
 
     input_SendEventMeta( p_input );
+    input_SendEventMetaExtras( p_input );
     /* TODO handle sout meta ? */
 }
 

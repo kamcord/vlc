@@ -206,6 +206,17 @@ void input_SendEventMeta( input_thread_t *p_input )
     vlc_event_send( &p_input->p->p_item->event_manager, &event );
 }
 
+void input_SendEventMetaExtras( input_thread_t *p_input )
+{
+    Trigger( p_input, INPUT_EVENT_ITEM_META_EXTRAS );
+
+    /* FIXME remove this ugliness ? */
+    vlc_event_t event;
+
+    event.type = vlc_InputItemMetaExtrasChanged;
+    vlc_event_send( &p_input->p->p_item->event_manager, &event );
+}
+
 void input_SendEventMetaInfo( input_thread_t *p_input )
 {
     Trigger( p_input, INPUT_EVENT_ITEM_INFO );

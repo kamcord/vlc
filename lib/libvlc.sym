@@ -77,6 +77,7 @@ libvlc_log_iterator_next
 libvlc_log_open
 libvlc_media_add_option
 libvlc_media_add_option_flag
+libvlc_media_copy_meta_extra_names
 libvlc_media_discoverer_event_manager
 libvlc_media_discoverer_is_running
 libvlc_media_discoverer_localized_name
@@ -93,6 +94,8 @@ libvlc_media_event_manager
 libvlc_media_get_codec_description
 libvlc_media_get_duration
 libvlc_media_get_meta
+libvlc_media_get_meta_extra
+libvlc_media_get_meta_extra_count
 libvlc_media_get_mrl
 libvlc_media_get_state
 libvlc_media_get_stats

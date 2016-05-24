@@ -196,6 +196,22 @@ static void input_item_meta_changed( const vlc_event_t *p_event,
 }
 
 /**************************************************************************
+ * input_item_meta_extras_changed (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_meta_extras_changed( const vlc_event_t *p_event,
+                                            void * user_data )
+{
+    libvlc_media_t * p_md = user_data;
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaMetaExtrasChanged;
+
+    /* Send the event */
+    libvlc_event_send( p_md->p_event_manager, &event );
+}
+
+/**************************************************************************
  * input_item_duration_changed (Private) (vlc event Callback)
  **************************************************************************/
 static void input_item_duration_changed( const vlc_event_t *p_event,
@@ -308,6 +324,10 @@ static void install_input_item_observer( libvlc_media_t *p_md )
                       input_item_meta_changed,
                       p_md );
     vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemMetaExtrasChanged,
+                      input_item_meta_extras_changed,
+                      p_md );
+    vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemDurationChanged,
                       input_item_duration_changed,
                       p_md );
@@ -337,6 +357,10 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemMetaChanged,
                       input_item_meta_changed,
+                      p_md );
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemMetaExtrasChanged,
+                      input_item_meta_extras_changed,
                       p_md );
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemDurationChanged,
@@ -637,6 +661,26 @@ int libvlc_media_save_meta( libvlc_media_t *p_md )
     vlc_object_t *p_obj = VLC_OBJECT(p_md->p_libvlc_instance->p_libvlc_int);
     return input_item_WriteMeta( p_obj, p_md->p_input_item ) == VLC_SUCCESS;
 }
+
+/**************************************************************************
++ * Getter for "extra" meta information
++ **************************************************************************/
+
+const char * libvlc_media_get_meta_extra( libvlc_media_t *p_md, const char *psz_name )
+{
+    return input_item_GetMetaExtra( p_md->p_input_item, psz_name );
+}
+
+unsigned libvlc_media_get_meta_extra_count( libvlc_media_t *p_md )
+{
+    return input_item_GetMetaExtraCount( p_md->p_input_item );
+}
+
+char** libvlc_media_copy_meta_extra_names( libvlc_media_t *p_md )
+{
+    return input_item_CopyMetaExtraNames( p_md->p_input_item );
+}
+
 
 /**************************************************************************
  * Getter for state information

@@ -398,6 +398,8 @@ typedef enum input_event_type_e
     /* A vout_thread_t object has been created/deleted by *the input* */
     INPUT_EVENT_VOUT,
 
+    INPUT_EVENT_ITEM_META_EXTRAS
+
 } input_event_type_e;
 
 /**
